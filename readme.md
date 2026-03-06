@@ -1,7 +1,7 @@
 输出扩展：
-个 FLOAT 输出：分别对应 score_phash, score_ahash, score_dhash, score_whash。你可以观察到不同算法给出的分数差异。
-个 BOOLEAN 输出：分别对应上述四种算法是否超过阈值。这允许你在工作流中设置更复杂的逻辑（例如：“只有当 pHash 和 dHash 都认为相似时，才执行下一步”）。
-个 STRING 输出：debug_info 会打印出每种算法的具体得分、汉明距离和哈希值字符串，方便你在控制台或通过 ShowText 节点查看。
+4个 FLOAT 输出：分别对应 score_phash, score_ahash, score_dhash, score_whash。你可以观察到不同算法给出的分数差异。
+4个 BOOLEAN 输出：分别对应上述四种算法是否超过阈值。这允许你在工作流中设置更复杂的逻辑（例如：“只有当 pHash 和 dHash 都认为相似时，才执行下一步”）。
+4个 STRING 输出：debug_info 会打印出每种算法的具体得分、汉明距离和哈希值字符串，方便你在控制台或通过 ShowText 节点查看。
 算法实现细节：
 使用了 imagehash.phash, average_hash, dhash, whash。
 增加了异常处理：whash (小波哈希) 对图像尺寸有特定要求（必须是2的幂次且大于等于某个值），代码中加入了 try-except 块，如果某种算法因图片尺寸问题失败，该路输出会返回 0.0 和 False，而不会导致整个节点崩溃。
