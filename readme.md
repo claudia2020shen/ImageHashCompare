@@ -55,3 +55,62 @@
 
 ---
 *更多详细信息请访问: [https://github.com/claudia2020shen/ImageHashCompare](https://github.com/claudia2020shen/ImageHashCompare)*
+
+
+# ComfyUI Image Hash Compare Plugin
+
+> **Source**: This plugin code and documentation originate from the GitHub project [claudia2020shen/ImageHashCompare](https://github.com/claudia2020shen/ImageHashCompare).
+
+## 📖 Introduction
+This is a custom node designed specifically for **ComfyUI** to compare the similarity of two images using hash algorithms. The node outputs scores, boolean judgments, and detailed debug information for four different hash algorithms simultaneously, enabling users to implement precise image deduplication or similarity control logic within their workflows.
+
+## 🚀 Output Extensions
+
+The node provides three categories of outputs, totaling 12 ports:
+
+### 1. Float Scores (4x FLOAT)
+Corresponding to the similarity scores of the four algorithms, allowing you to observe the differences in scores given by each method:
+- `score_phash`: Perceptual Hash score
+- `score_ahash`: Average Hash score
+- `score_dhash`: Difference Hash score
+- `score_whash`: Wavelet Hash score
+
+### 2. Boolean Threshold Checks (4x BOOLEAN)
+Indicates whether the score for each of the four algorithms has exceeded the preset threshold. This allows for setting up complex logic branches in your workflow, for example:
+> *"Proceed to the next step only if both pHash and dHash consider the images similar."*
+
+- `is_similar_phash`
+- `is_similar_ahash`
+- `is_similar_dhash`
+- `is_similar_whash`
+
+### 3. Debug Information (STRING)
+- `debug_info`: Prints the specific score, Hamming Distance, and hash value string for each algorithm. This makes it easy to view details in the console or via a `ShowText` node directly in the workflow interface.
+
+## ⚙️ Algorithm Implementation Details
+
+This node is implemented using Python's `imagehash` library, specifically utilizing:
+- `imagehash.phash`
+- `imagehash.average_hash`
+- `imagehash.dhash`
+- `imagehash.whash`
+
+### 🛡️ Exception Handling
+Specific attention is paid to **wHash (Wavelet Hash)**, which has strict requirements for image dimensions (must be a power of 2 and greater than or equal to a certain value). A `try-except` block has been added to the code:
+- If an algorithm fails due to image dimension issues, that specific output path will automatically return `0.0` (Float) and `False` (Boolean).
+- **Benefit**: This ensures that a failure in a single algorithm does not crash the entire ComfyUI node, maintaining workflow stability.
+
+## 🧠 Algorithm Characteristics Analysis
+
+| Algorithm | Full Name | Characteristics | Recommended Use Case |
+| :--- | :--- | :--- | :--- |
+| **pHash** | Perceptual Hash | **Recommended as the primary metric**. Exhibits strong robustness against image scaling, minor compression, and brightness variations. Best represents "visual similarity to the human eye". | General similarity detection |
+| **aHash** | Average Hash | **Fastest calculation speed**, but highly sensitive to brightness changes. If two images differ only in brightness, the score will be very low. | Quick initial screening |
+| **dHash** | Difference Hash | Based on gradients (edges). Sensitive to the **geometric structure** of the image, insensitive to color. Scores remain high even if colors are completely different but the structure is identical. | Structure/Composition comparison |
+| **wHash** | Wavelet Hash | Based on wavelet transform. Generally **more accurate** than pHash, but has strict image size requirements and is slightly slower to compute. | High-precision comparison |
+
+## 💡 Usage Tips
+By outputting these four values simultaneously, you can control your ComfyUI workflow logic with great precision, flexibly addressing various image deduplication or filtering needs.
+
+---
+*For more details, please visit: [https://github.com/claudia2020shen/ImageHashCompare](https://github.com/claudia2020shen/ImageHashCompare)*
